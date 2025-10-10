@@ -33,11 +33,11 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-
       - name: Run unit tests
         run: npm run test:unit
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox
 
       - name: Run integration tests in Chromium
         run: npm run test:chromium
