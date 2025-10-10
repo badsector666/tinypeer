@@ -25,9 +25,12 @@ export async function startPeerServer(port: number = 9000): Promise<number> {
       }
     }, 5000)
 
-    serverProcess.stdout?.on('data', (data) => {
+    serverProcess.stdout?.on('data', data => {
       const output = data.toString()
-      if (output.includes('Started PeerServer') || output.includes('listening')) {
+      if (
+        output.includes('Started PeerServer') ||
+        output.includes('listening')
+      ) {
         if (!started) {
           started = true
           clearTimeout(timeout)
@@ -36,17 +39,17 @@ export async function startPeerServer(port: number = 9000): Promise<number> {
       }
     })
 
-    serverProcess.stderr?.on('data', (data) => {
+    serverProcess.stderr?.on('data', data => {
       console.error('PeerServer error:', data.toString())
     })
 
-    serverProcess.on('error', (error) => {
+    serverProcess.on('error', error => {
       clearTimeout(timeout)
       serverProcess = null
       reject(error)
     })
 
-    serverProcess.on('exit', (code) => {
+    serverProcess.on('exit', code => {
       if (!started) {
         clearTimeout(timeout)
         serverProcess = null
@@ -69,7 +72,7 @@ export async function stopPeerServer(): Promise<void> {
     return
   }
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const process = serverProcess
     serverProcess = null
 

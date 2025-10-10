@@ -13,11 +13,11 @@ let connection = null
 let remoteUsername = 'Remote'
 
 const peer = await createPeer({
-  id: 'chat-' + Math.floor(Math.random() * 1000)
+  id: 'chat-' + Math.floor(Math.random() * 1000),
 })
 peerIdEl.textContent = peer.id
 
-peer.on('connection', async (conn) => {
+peer.on('connection', async conn => {
   if (connection) {
     conn.close()
     return
@@ -27,7 +27,7 @@ peer.on('connection', async (conn) => {
   statusEl.textContent = `Connected to ${conn.peer}`
   connectBtn.disabled = true
 
-  connection.on('data', (data) => {
+  connection.on('data', data => {
     if (data.type === 'username') {
       remoteUsername = data.username
     } else if (data.type === 'message') {
@@ -57,13 +57,13 @@ connectBtn.addEventListener('click', async () => {
 
   try {
     connection = await peer.connect(remoteId, {
-      metadata: { username: usernameInput.value }
+      metadata: { username: usernameInput.value },
     })
 
     statusEl.textContent = `Connected to ${remoteId}`
     connectBtn.textContent = 'Connect'
 
-    connection.on('data', (data) => {
+    connection.on('data', data => {
       if (data.type === 'username') {
         remoteUsername = data.username
       } else if (data.type === 'message') {
@@ -107,7 +107,7 @@ sendBtn.addEventListener('click', async () => {
   messageInput.value = ''
 })
 
-messageInput.addEventListener('keypress', (e) => {
+messageInput.addEventListener('keypress', e => {
   if (e.key === 'Enter') {
     sendBtn.click()
   }

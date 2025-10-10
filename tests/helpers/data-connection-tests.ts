@@ -61,8 +61,8 @@ export function runDataConnectionTests(factory: PeerFactory) {
       const host = await factory.create('host-peer')
       const client = await factory.create('client-peer')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
-        host.on('connection', (conn) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
+        host.on('connection', conn => {
           resolve(conn)
         })
       })
@@ -89,7 +89,7 @@ export function runDataConnectionTests(factory: PeerFactory) {
       const host = await factory.create('host-metadata')
       const client = await factory.create('client-metadata')
 
-      const connectionPromise = new Promise<Connection>((resolve) => {
+      const connectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
@@ -110,14 +110,14 @@ export function runDataConnectionTests(factory: PeerFactory) {
       const host = await factory.create('host-close-test')
       const client = await factory.create('client-close-test')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('host-close-test')
       const hostConnection = await hostConnectionPromise
 
-      const closePromise = new Promise<void>((resolve) => {
+      const closePromise = new Promise<void>(resolve => {
         hostConnection.on('close', () => {
           resolve()
         })
@@ -138,9 +138,7 @@ export function runDataConnectionTests(factory: PeerFactory) {
 
       peer.destroy()
 
-      await expect(
-        peer.connect('some-peer')
-      ).rejects.toThrow()
+      await expect(peer.connect('some-peer')).rejects.toThrow()
     })
 
     it('handles peer disconnect', async () => {
@@ -161,14 +159,14 @@ export function runDataConnectionTests(factory: PeerFactory) {
       const client2 = await factory.create('multi-client-2')
 
       const connections: Connection[] = []
-      host.on('connection', (conn) => {
+      host.on('connection', conn => {
         connections.push(conn)
       })
 
       await client1.connect('multi-host', { metadata: { id: 1 } })
       await client2.connect('multi-host', { metadata: { id: 2 } })
 
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(connections.length).toBe(2)
       expect(connections[0]?.peer).toBe('multi-client-1')
@@ -199,15 +197,15 @@ export function runDataConnectionTests(factory: PeerFactory) {
       const host = await factory.create('data-event-host')
       const client = await factory.create('data-event-client')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('data-event-host')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<any>((resolve) => {
-        hostConnection.on('data', (data) => resolve(data))
+      const dataPromise = new Promise<any>(resolve => {
+        hostConnection.on('data', data => resolve(data))
       })
 
       clientConnection.send('test message')
@@ -223,14 +221,14 @@ export function runDataConnectionTests(factory: PeerFactory) {
       const host = await factory.create('close-event-host')
       const client = await factory.create('close-event-client')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('close-event-host')
       const hostConnection = await hostConnectionPromise
 
-      const closePromise = new Promise<void>((resolve) => {
+      const closePromise = new Promise<void>(resolve => {
         hostConnection.on('close', () => resolve())
       })
 

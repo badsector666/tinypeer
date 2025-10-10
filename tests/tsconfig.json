@@ -4,16 +4,8 @@
     "declaration": false,
     "declarationMap": false,
     "noEmit": true,
-    "types": [
-      "@vitest/browser/providers/playwright",
-      "vitest/globals"
-    ]
+    "types": ["@vitest/browser/providers/playwright", "vitest/globals"]
   },
-  "include": [
-    "**/*.ts",
-    "**/*.test.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["**/*.ts", "**/*.test.ts"],
+  "exclude": ["node_modules"]
 }

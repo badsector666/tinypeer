@@ -1,26 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Caller - Video Call</title>
-</head>
-<body>
-  <h1>Caller</h1>
-  <div>
-    <p>Your Peer ID: <strong id="peer-id">Connecting...</strong></p>
-  </div>
-  <div>
-    <input type="text" id="callee-id" placeholder="Paste callee's peer ID here">
-    <button id="call-btn">Start Call</button>
-  </div>
-  <div>
-    <h2>Local Video</h2>
-    <video id="local-video" autoplay muted width="400"></video>
-  </div>
-  <div>
-    <h2>Remote Video</h2>
-    <video id="remote-video" autoplay width="400"></video>
-  </div>
-  <script type="module" src="./caller.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Caller - Video Call</title>
+  </head>
+  <body>
+    <h1>Caller</h1>
+    <div>
+      <p>Your Peer ID: <strong id="peer-id">Connecting...</strong></p>
+    </div>
+    <div>
+      <input
+        type="text"
+        id="callee-id"
+        placeholder="Paste callee's peer ID here"
+      />
+      <button id="call-btn">Start Call</button>
+    </div>
+    <div>
+      <h2>Local Video</h2>
+      <video id="local-video" autoplay muted width="400"></video>
+    </div>
+    <div>
+      <h2>Remote Video</h2>
+      <video id="remote-video" autoplay width="400"></video>
+    </div>
+    <script type="module" src="./caller.js"></script>
+  </body>
 </html>

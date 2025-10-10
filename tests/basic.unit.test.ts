@@ -2,14 +2,19 @@ import { describe, it, expect } from 'vitest'
 import { generateId, generateToken, isValidId } from '../src/utils.js'
 import { createEmitter } from '../src/events.js'
 import { createPeer, createDataPeer } from '../src/index.js'
-import { generateMediaConnectionId, createConnection } from '../src/connection.js'
+import {
+  generateMediaConnectionId,
+  createConnection,
+} from '../src/connection.js'
 
 describe('Utility Functions', () => {
   describe('generateId', () => {
     it('generates a UUID', () => {
       const id = generateId()
       expect(id).toHaveLength(36)
-      expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/)
+      expect(id).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+      )
     })
 
     it('generates unique IDs', () => {
@@ -55,7 +60,7 @@ describe('Event System', () => {
     const emitter = createEmitter()
     let receivedData: any = null
 
-    emitter.on('test', (data) => {
+    emitter.on('test', data => {
       receivedData = data
     })
     emitter.emit('test', 'data')
@@ -68,10 +73,10 @@ describe('Event System', () => {
     let received1: any = null
     let received2: any = null
 
-    emitter.on('test', (data) => {
+    emitter.on('test', data => {
       received1 = data
     })
-    emitter.on('test', (data) => {
+    emitter.on('test', data => {
       received2 = data
     })
     emitter.emit('test', 'data')

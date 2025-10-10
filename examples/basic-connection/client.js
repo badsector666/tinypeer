@@ -22,13 +22,13 @@ connectBtn.addEventListener('click', async () => {
 
   try {
     hostConnection = await peer.connect(hostId, {
-      metadata: { username: 'Client' + Math.floor(Math.random() * 1000) }
+      metadata: { username: 'Client' + Math.floor(Math.random() * 1000) },
     })
 
     connectedToEl.textContent = hostId
     connectBtn.textContent = 'Connected'
 
-    hostConnection.on('data', (data) => {
+    hostConnection.on('data', data => {
       const li = document.createElement('li')
       li.textContent = `Host: ${JSON.stringify(data)}`
       messagesEl.appendChild(li)

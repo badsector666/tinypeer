@@ -8,13 +8,13 @@ const remoteVideo = document.getElementById('remote-video')
 const peer = await createPeer()
 peerIdEl.textContent = peer.id
 
-peer.on('call', async (call) => {
+peer.on('call', async call => {
   statusEl.textContent = `Incoming call from ${call.peer}...`
 
   try {
     const localStream = await navigator.mediaDevices.getUserMedia({
       video: true,
-      audio: true
+      audio: true,
     })
 
     localVideo.srcObject = localStream
@@ -32,7 +32,7 @@ peer.on('call', async (call) => {
       remoteVideo.srcObject = null
     })
 
-    call.on('error', (error) => {
+    call.on('error', error => {
       alert('Call error: ' + error.message)
       statusEl.textContent = 'Call error'
     })

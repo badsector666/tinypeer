@@ -18,7 +18,7 @@ export function runErrorHandlingTests(factory: PeerFactory) {
       const host = await factory.create('send-closed-host')
       const client = await factory.create('send-closed-client')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
@@ -28,9 +28,11 @@ export function runErrorHandlingTests(factory: PeerFactory) {
       await hostConnectionPromise
 
       clientConnection.close()
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 100))
 
-      await expect(clientConnection.send({ test: 'data' })).rejects.toThrow('Connection is closed')
+      await expect(clientConnection.send({ test: 'data' })).rejects.toThrow(
+        'Connection is closed'
+      )
 
       client.destroy()
       host.destroy()
@@ -46,10 +48,10 @@ export function runErrorHandlingTests(factory: PeerFactory) {
       const connections: Connection[] = []
       const closePromises: Promise<void>[] = []
 
-      host.on('connection', (conn) => {
+      host.on('connection', conn => {
         connections.push(conn)
         closePromises.push(
-          new Promise<void>((resolve) => {
+          new Promise<void>(resolve => {
             conn.on('close', resolve)
           })
         )
@@ -58,7 +60,7 @@ export function runErrorHandlingTests(factory: PeerFactory) {
       await client1.connect('cleanup-host')
       await client2.connect('cleanup-host')
 
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(connections.length).toBe(2)
 
@@ -66,7 +68,9 @@ export function runErrorHandlingTests(factory: PeerFactory) {
 
       await Promise.all(closePromises)
 
-      await expect(host.connect('some-peer')).rejects.toThrow('Peer has been destroyed')
+      await expect(host.connect('some-peer')).rejects.toThrow(
+        'Peer has been destroyed'
+      )
 
       client1.destroy()
       client2.destroy()
@@ -76,18 +80,18 @@ export function runErrorHandlingTests(factory: PeerFactory) {
       const host = await factory.create('disconnect-active-host')
       const client = await factory.create('disconnect-active-client')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('disconnect-active-host')
       const hostConnection = await hostConnectionPromise
 
-      const clientClosePromise = new Promise<void>((resolve) => {
+      const clientClosePromise = new Promise<void>(resolve => {
         clientConnection.on('close', resolve)
       })
 
-      const hostClosePromise = new Promise<void>((resolve) => {
+      const hostClosePromise = new Promise<void>(resolve => {
         hostConnection.on('close', resolve)
       })
 
@@ -95,12 +99,16 @@ export function runErrorHandlingTests(factory: PeerFactory) {
 
       await Promise.race([
         clientClosePromise,
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000)),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), 5000)
+        ),
       ])
 
       await Promise.race([
         hostClosePromise,
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000)),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), 5000)
+        ),
       ])
 
       client.destroy()
@@ -111,7 +119,7 @@ export function runErrorHandlingTests(factory: PeerFactory) {
       const host = await factory.create('leave-host')
       const client = await factory.create('leave-client')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
@@ -119,15 +127,17 @@ export function runErrorHandlingTests(factory: PeerFactory) {
       const hostConnection = await hostConnectionPromise
 
       const closePromises = [
-        new Promise<void>((resolve) => clientConnection.on('close', resolve)),
-        new Promise<void>((resolve) => hostConnection.on('close', resolve)),
+        new Promise<void>(resolve => clientConnection.on('close', resolve)),
+        new Promise<void>(resolve => hostConnection.on('close', resolve)),
       ]
 
       client.destroy()
 
       await Promise.race([
         Promise.all(closePromises),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Leave timeout')), 5000)),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Leave timeout')), 5000)
+        ),
       ])
 
       host.destroy()
@@ -137,7 +147,7 @@ export function runErrorHandlingTests(factory: PeerFactory) {
       const host = await factory.create('handler-cleanup-host')
       const client = await factory.create('handler-cleanup-client')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
@@ -151,7 +161,7 @@ export function runErrorHandlingTests(factory: PeerFactory) {
 
       clientConnection.close()
 
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       try {
         await clientConnection.send({ test: 'data' })
@@ -182,7 +192,7 @@ export function runErrorHandlingTests(factory: PeerFactory) {
       const client = await factory.create('simultaneous-client')
 
       const connections: Connection[] = []
-      host.on('connection', (conn) => {
+      host.on('connection', conn => {
         connections.push(conn)
       })
 
@@ -192,7 +202,7 @@ export function runErrorHandlingTests(factory: PeerFactory) {
         client.connect('simultaneous-host', { metadata: { id: 3 } }),
       ])
 
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(conn1).toBeDefined()
       expect(conn2).toBeDefined()
@@ -211,7 +221,9 @@ export function runErrorHandlingTests(factory: PeerFactory) {
 
         peer.destroy()
 
-        await expect(peer.connect('test')).rejects.toThrow('Peer has been destroyed')
+        await expect(peer.connect('test')).rejects.toThrow(
+          'Peer has been destroyed'
+        )
       }
     }, 10000)
   })
@@ -221,7 +233,7 @@ export function runErrorHandlingTests(factory: PeerFactory) {
       const host = await factory.create('empty-data-host')
       const client = await factory.create('empty-data-client')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
@@ -229,7 +241,7 @@ export function runErrorHandlingTests(factory: PeerFactory) {
       const hostConnection = await hostConnectionPromise
 
       const receivedData: any[] = []
-      hostConnection.on('data', (data) => {
+      hostConnection.on('data', data => {
         receivedData.push(data)
       })
 
@@ -238,7 +250,7 @@ export function runErrorHandlingTests(factory: PeerFactory) {
       await clientConnection.send({})
       await clientConnection.send([])
 
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(receivedData).toHaveLength(4)
       expect(receivedData[0]).toBeNull()

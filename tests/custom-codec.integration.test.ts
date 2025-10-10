@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { createDataPeer, type DataCodec, type Connection } from '../src/index.js'
+import {
+  createDataPeer,
+  type DataCodec,
+  type Connection,
+} from '../src/index.js'
 import { createTestFactory } from './helpers/test-factory.js'
 
 const TEST_PORT = 9000
@@ -16,7 +20,7 @@ const simpleJSONCodec: DataCodec = {
     const json = JSON.stringify(payload)
     return new TextEncoder().encode(json).buffer
   },
-  decode: (buffer) => {
+  decode: buffer => {
     const json = new TextDecoder().decode(buffer)
     const payload = JSON.parse(json)
     return { data: payload.data, metadata: payload.metadata }
@@ -34,7 +38,7 @@ const prefixCodec: DataCodec = {
     result.set(jsonBytes, prefix.length)
     return result.buffer
   },
-  decode: (buffer) => {
+  decode: buffer => {
     const bytes = new Uint8Array(buffer as ArrayBuffer)
     const prefix = new TextDecoder().decode(bytes.subarray(0, 7))
     if (prefix !== 'PREFIX:') {
@@ -60,14 +64,14 @@ describe('Custom Codec Integration Tests', () => {
         codec: simpleJSONCodec,
       })
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('custom-codec-host-1')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<unknown>((resolve) => {
+      const dataPromise = new Promise<unknown>(resolve => {
         hostConnection.on('data', (data: unknown) => resolve(data))
       })
 
@@ -93,14 +97,14 @@ describe('Custom Codec Integration Tests', () => {
         codec: simpleJSONCodec,
       })
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('custom-codec-host-binary')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<unknown>((resolve) => {
+      const dataPromise = new Promise<unknown>(resolve => {
         hostConnection.on('data', (data: unknown) => resolve(data))
       })
 
@@ -111,7 +115,7 @@ describe('Custom Codec Integration Tests', () => {
         timestamp: 12345,
       })
 
-      const receivedData = await dataPromise as any
+      const receivedData = (await dataPromise) as any
 
       expect(receivedData.message).toBe('Image data')
       expect(receivedData.image).toEqual([1, 2, 3, 4, 5])
@@ -133,18 +137,25 @@ describe('Custom Codec Integration Tests', () => {
         codec: simpleJSONCodec,
       })
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('custom-codec-meta-host')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<{ data: unknown; metadata: unknown }>((resolve) => {
-        hostConnection.on('data', (data: unknown, metadata: unknown) => resolve({ data, metadata }))
-      })
+      const dataPromise = new Promise<{ data: unknown; metadata: unknown }>(
+        resolve => {
+          hostConnection.on('data', (data: unknown, metadata: unknown) =>
+            resolve({ data, metadata })
+          )
+        }
+      )
 
-      await clientConnection.send({ value: 123 }, { sender: 'client', timestamp: Date.now() })
+      await clientConnection.send(
+        { value: 123 },
+        { sender: 'client', timestamp: Date.now() }
+      )
 
       const { data, metadata } = await dataPromise
 
@@ -170,14 +181,14 @@ describe('Custom Codec Integration Tests', () => {
         codec: prefixCodec,
       })
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('prefix-codec-host')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<unknown>((resolve) => {
+      const dataPromise = new Promise<unknown>(resolve => {
         hostConnection.on('data', (data: unknown) => resolve(data))
       })
 
@@ -211,14 +222,14 @@ describe('Custom Codec Integration Tests', () => {
       })
 
       const connections: any[] = []
-      host.on('connection', (conn) => {
+      host.on('connection', conn => {
         connections.push(conn)
       })
 
       await client1.connect('multi-codec-host')
       await client2.connect('multi-codec-host')
 
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(connections.length).toBe(2)
 
@@ -234,7 +245,7 @@ describe('Custom Codec Integration Tests', () => {
       await conn1.send({ from: 'client1', value: 'A' })
       await conn2.send({ from: 'client2', value: 'B' })
 
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       client1.destroy()
       client2.destroy()
@@ -253,7 +264,7 @@ describe('Custom Codec Integration Tests', () => {
         codec: simpleJSONCodec,
       })
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
@@ -269,13 +280,16 @@ describe('Custom Codec Integration Tests', () => {
       await clientConnection.send({ from: 'client', message: 'Hello Host' })
       await hostConnection.send({ from: 'host', message: 'Hello Client' })
 
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(hostReceived.length).toBe(1)
       expect(hostReceived[0]).toEqual({ from: 'client', message: 'Hello Host' })
 
       expect(clientReceived.length).toBe(1)
-      expect(clientReceived[0]).toEqual({ from: 'host', message: 'Hello Client' })
+      expect(clientReceived[0]).toEqual({
+        from: 'host',
+        message: 'Hello Client',
+      })
 
       client.destroy()
       host.destroy()
@@ -286,7 +300,7 @@ describe('Custom Codec Integration Tests', () => {
     const factory = createTestFactory({
       name: 'CustomCodec',
       config: TEST_CONFIG,
-      createFn: (opts) => createDataPeer({ ...opts, codec: simpleJSONCodec }),
+      createFn: opts => createDataPeer({ ...opts, codec: simpleJSONCodec }),
     })
 
     it('creates peer with custom codec', async () => {
@@ -312,14 +326,14 @@ describe('Custom Codec Integration Tests', () => {
         codec: simpleJSONCodec,
       })
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('nested-codec-host')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<unknown>((resolve) => {
+      const dataPromise = new Promise<unknown>(resolve => {
         hostConnection.on('data', (data: unknown) => resolve(data))
       })
 
@@ -365,14 +379,14 @@ describe('Custom Codec Integration Tests', () => {
         codec: simpleJSONCodec,
       })
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('array-codec-host')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<unknown>((resolve) => {
+      const dataPromise = new Promise<unknown>(resolve => {
         hostConnection.on('data', (data: unknown) => resolve(data))
       })
 

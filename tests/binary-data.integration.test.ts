@@ -19,14 +19,14 @@ describe('Binary Data Integration Tests', () => {
       const host = await createPeer('binary-host-1')
       const client = await createPeer('binary-client-1')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('binary-host-1')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<unknown>((resolve) => {
+      const dataPromise = new Promise<unknown>(resolve => {
         hostConnection.on('data', (data: unknown) => resolve(data))
       })
 
@@ -46,14 +46,14 @@ describe('Binary Data Integration Tests', () => {
       const host = await createPeer('binary-host-2')
       const client = await createPeer('binary-client-2')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('binary-host-2')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<unknown>((resolve) => {
+      const dataPromise = new Promise<unknown>(resolve => {
         hostConnection.on('data', (data: unknown) => resolve(data))
       })
 
@@ -73,14 +73,14 @@ describe('Binary Data Integration Tests', () => {
       const host = await createPeer('binary-host-large')
       const client = await createPeer('binary-client-large')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('binary-host-large')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<unknown>((resolve) => {
+      const dataPromise = new Promise<unknown>(resolve => {
         hostConnection.on('data', (data: unknown) => resolve(data))
       })
 
@@ -96,7 +96,9 @@ describe('Binary Data Integration Tests', () => {
 
       expect(receivedData).toBeInstanceOf(Uint8Array)
       expect((receivedData as Uint8Array).length).toBe(size)
-      expect(Array.from(receivedData as Uint8Array)).toEqual(Array.from(sentData))
+      expect(Array.from(receivedData as Uint8Array)).toEqual(
+        Array.from(sentData)
+      )
 
       client.destroy()
       host.destroy()
@@ -106,14 +108,14 @@ describe('Binary Data Integration Tests', () => {
       const host = await createPeer('binary-host-int16')
       const client = await createPeer('binary-client-int16')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('binary-host-int16')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<unknown>((resolve) => {
+      const dataPromise = new Promise<unknown>(resolve => {
         hostConnection.on('data', (data: unknown) => resolve(data))
       })
 
@@ -134,14 +136,14 @@ describe('Binary Data Integration Tests', () => {
       const host = await createPeer('binary-host-float32')
       const client = await createPeer('binary-client-float32')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('binary-host-float32')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<unknown>((resolve) => {
+      const dataPromise = new Promise<unknown>(resolve => {
         hostConnection.on('data', (data: unknown) => resolve(data))
       })
 
@@ -151,7 +153,9 @@ describe('Binary Data Integration Tests', () => {
       const receivedData = await dataPromise
 
       expect(receivedData).toBeInstanceOf(Uint8Array)
-      const result = new Float32Array((receivedData as Uint8Array).slice().buffer)
+      const result = new Float32Array(
+        (receivedData as Uint8Array).slice().buffer
+      )
       expect(Array.from(result)).toEqual(Array.from(sentData))
 
       client.destroy()
@@ -164,16 +168,20 @@ describe('Binary Data Integration Tests', () => {
       const host = await createPeer('binary-meta-host-1')
       const client = await createPeer('binary-meta-client-1')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('binary-meta-host-1')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<{ data: unknown; metadata: unknown }>((resolve) => {
-        hostConnection.on('data', (data, metadata) => resolve({ data, metadata }))
-      })
+      const dataPromise = new Promise<{ data: unknown; metadata: unknown }>(
+        resolve => {
+          hostConnection.on('data', (data, metadata) =>
+            resolve({ data, metadata })
+          )
+        }
+      )
 
       const sentData = new Uint8Array([255, 128, 64, 32])
       const sentMetadata = { filename: 'data.bin', size: 4, type: 'binary' }
@@ -193,16 +201,20 @@ describe('Binary Data Integration Tests', () => {
       const host = await createPeer('binary-image-host')
       const client = await createPeer('binary-image-client')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('binary-image-host')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<{ data: unknown; metadata: unknown }>((resolve) => {
-        hostConnection.on('data', (data, metadata) => resolve({ data, metadata }))
-      })
+      const dataPromise = new Promise<{ data: unknown; metadata: unknown }>(
+        resolve => {
+          hostConnection.on('data', (data, metadata) =>
+            resolve({ data, metadata })
+          )
+        }
+      )
 
       const imageSize = 1000
       const sentData = new Uint8Array(imageSize).fill(128)
@@ -232,7 +244,7 @@ describe('Binary Data Integration Tests', () => {
       const host = await createPeer('mixed-host-1')
       const client = await createPeer('mixed-client-1')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
@@ -248,7 +260,7 @@ describe('Binary Data Integration Tests', () => {
       await clientConnection.send(new Uint8Array([1, 2, 3]))
       await clientConnection.send('Hello World')
 
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(receivedMessages.length).toBe(3)
       expect(receivedMessages[0]).toEqual({ type: 'json', value: 123 })
@@ -264,7 +276,7 @@ describe('Binary Data Integration Tests', () => {
       const host = await createPeer('bidirectional-host')
       const client = await createPeer('bidirectional-client')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
@@ -288,7 +300,7 @@ describe('Binary Data Integration Tests', () => {
       await clientConnection.send(clientData)
       await hostConnection.send(hostData)
 
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(hostReceived.length).toBe(1)
       expect(hostReceived[0]).toBeInstanceOf(Uint8Array)
@@ -308,14 +320,14 @@ describe('Binary Data Integration Tests', () => {
       const host = await createPeer('empty-binary-host')
       const client = await createPeer('empty-binary-client')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('empty-binary-host')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<unknown>((resolve) => {
+      const dataPromise = new Promise<unknown>(resolve => {
         hostConnection.on('data', (data: unknown) => resolve(data))
       })
 
@@ -334,16 +346,20 @@ describe('Binary Data Integration Tests', () => {
       const host = await createPeer('empty-meta-host')
       const client = await createPeer('empty-meta-client')
 
-      const hostConnectionPromise = new Promise<Connection>((resolve) => {
+      const hostConnectionPromise = new Promise<Connection>(resolve => {
         host.on('connection', resolve)
       })
 
       const clientConnection = await client.connect('empty-meta-host')
       const hostConnection = await hostConnectionPromise
 
-      const dataPromise = new Promise<{ data: unknown; metadata: unknown }>((resolve) => {
-        hostConnection.on('data', (data, metadata) => resolve({ data, metadata }))
-      })
+      const dataPromise = new Promise<{ data: unknown; metadata: unknown }>(
+        resolve => {
+          hostConnection.on('data', (data, metadata) =>
+            resolve({ data, metadata })
+          )
+        }
+      )
 
       await clientConnection.send(new Uint8Array([1, 2, 3]), {})
 

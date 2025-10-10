@@ -46,8 +46,8 @@ describe('Media Connection Tests', () => {
 
       const localStream = await getTestMediaStream()
 
-      const callPromise = new Promise<MediaConnection>((resolve) => {
-        callee.on('call', (call) => {
+      const callPromise = new Promise<MediaConnection>(resolve => {
+        callee.on('call', call => {
           resolve(call)
         })
       })
@@ -80,13 +80,13 @@ describe('Media Connection Tests', () => {
 
       peers.push(caller, callee)
 
-  const callerStream = await getTestMediaStream()
+      const callerStream = await getTestMediaStream()
 
-      callee.on('call', async (_call) => {
+      callee.on('call', async _call => {
         // Don't answer - let it timeout
       })
 
-  const call = await caller.call('callee-2', callerStream)
+      const call = await caller.call('callee-2', callerStream)
 
       expect(call).toBeDefined()
       expect(typeof call.answer).toBe('function')
@@ -112,8 +112,8 @@ describe('Media Connection Tests', () => {
         timestamp: Date.now(),
       }
 
-      const callPromise = new Promise<MediaConnection>((resolve) => {
-        callee.on('call', (call) => {
+      const callPromise = new Promise<MediaConnection>(resolve => {
+        callee.on('call', call => {
           resolve(call)
         })
       })
@@ -138,11 +138,14 @@ describe('Media Connection Tests', () => {
 
       peers.push(caller, callee)
 
-      callee.on('call', async (call) => {
+      callee.on('call', async call => {
         await call.reject()
       })
 
-      const call = await caller.call('callee-reject', await getTestMediaStream())
+      const call = await caller.call(
+        'callee-reject',
+        await getTestMediaStream()
+      )
 
       expect(call).toBeDefined()
     }, 10000)
@@ -159,8 +162,8 @@ describe('Media Connection Tests', () => {
 
       peers.push(caller, callee)
 
-      const callPromise = new Promise<MediaConnection>((resolve) => {
-        callee.on('call', (call) => {
+      const callPromise = new Promise<MediaConnection>(resolve => {
+        callee.on('call', call => {
           resolve(call)
         })
       })
@@ -189,16 +192,19 @@ describe('Media Connection Tests', () => {
 
       peers.push(caller, callee)
 
-      const call = await caller.call('callee-events', await getTestMediaStream())
+      const call = await caller.call(
+        'callee-events',
+        await getTestMediaStream()
+      )
 
-      const streamPromise = new Promise<void>((resolve) => {
-        call.on('stream', (stream) => {
+      const streamPromise = new Promise<void>(resolve => {
+        call.on('stream', stream => {
           expect(stream).toBeDefined()
           resolve()
         })
       })
 
-      const closePromise = new Promise<void>((resolve) => {
+      const closePromise = new Promise<void>(resolve => {
         call.on('close', () => {
           resolve()
         })
@@ -209,7 +215,7 @@ describe('Media Connection Tests', () => {
       // Wait for both events to fire, or time out after 1s so the test doesn't hang.
       await Promise.race([
         Promise.all([streamPromise, closePromise]).catch(() => {}),
-        new Promise((resolve) => setTimeout(resolve, 1000)),
+        new Promise(resolve => setTimeout(resolve, 1000)),
       ])
     }, 10000)
   })
@@ -229,7 +235,7 @@ describe('Media Connection Tests', () => {
 
       const stream = await getTestMediaStream()
 
-      callee.on('call', async (call) => {
+      callee.on('call', async call => {
         await call.answer(await getTestMediaStream())
       })
 
@@ -275,7 +281,7 @@ describe('Media Connection Tests', () => {
 
       peers.push(caller, callee)
 
-      callee.on('call', async (_call) => {
+      callee.on('call', async _call => {
         // Don't answer - let it timeout
       })
       const stream = await getTestMediaStream()
@@ -305,8 +311,8 @@ describe('Media Connection Tests', () => {
 
       peers.push(peer)
 
-      const callPromise = new Promise<void>((resolve) => {
-        peer.on('call', (call) => {
+      const callPromise = new Promise<void>(resolve => {
+        peer.on('call', call => {
           expect(call).toBeDefined()
           resolve()
         })
@@ -317,7 +323,7 @@ describe('Media Connection Tests', () => {
       // Wait briefly for the event in case it fires; timeout so test won't hang.
       await Promise.race([
         callPromise.catch(() => {}),
-        new Promise((resolve) => setTimeout(resolve, 100)),
+        new Promise(resolve => setTimeout(resolve, 100)),
       ])
     })
   })

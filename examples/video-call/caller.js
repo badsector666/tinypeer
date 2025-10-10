@@ -19,13 +19,13 @@ callBtn.addEventListener('click', async () => {
   try {
     const localStream = await navigator.mediaDevices.getUserMedia({
       video: true,
-      audio: true
+      audio: true,
     })
 
     localVideo.srcObject = localStream
 
     const call = await peer.call(calleeId, localStream, {
-      metadata: { username: 'Caller' }
+      metadata: { username: 'Caller' },
     })
 
     callBtn.textContent = 'Call in progress...'
@@ -42,7 +42,7 @@ callBtn.addEventListener('click', async () => {
       remoteVideo.srcObject = null
     })
 
-    call.on('error', (error) => {
+    call.on('error', error => {
       alert('Call error: ' + error.message)
       callBtn.disabled = false
       callBtn.textContent = 'Start Call'

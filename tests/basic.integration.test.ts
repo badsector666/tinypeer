@@ -1,6 +1,9 @@
 import { describe } from 'vitest'
 import { createDataPeer, createPeer } from '../src/index.js'
-import { runPeerCreationTests, runDataConnectionTests } from './helpers/data-connection-tests.js'
+import {
+  runPeerCreationTests,
+  runDataConnectionTests,
+} from './helpers/data-connection-tests.js'
 import { createTestFactory } from './helpers/test-factory.js'
 
 const TEST_PORT = 9000
@@ -32,4 +35,3 @@ describe('DataPeer Only Integration Tests', () => {
   runPeerCreationTests(factory)
   runDataConnectionTests(factory)
 })
-

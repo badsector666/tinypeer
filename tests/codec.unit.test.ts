@@ -56,7 +56,9 @@ describe('textCodec', () => {
       const decoded = textCodec.decode(encoded)
 
       expect(decoded.data).toBeInstanceOf(Uint8Array)
-      const result = new Uint16Array((decoded.data as Uint8Array).slice().buffer)
+      const result = new Uint16Array(
+        (decoded.data as Uint8Array).slice().buffer
+      )
       expect(Array.from(result)).toEqual(Array.from(data))
     })
 
@@ -76,7 +78,9 @@ describe('textCodec', () => {
       const decoded = textCodec.decode(encoded)
 
       expect(decoded.data).toBeInstanceOf(Uint8Array)
-      const result = new Float32Array((decoded.data as Uint8Array).slice().buffer)
+      const result = new Float32Array(
+        (decoded.data as Uint8Array).slice().buffer
+      )
       expect(Array.from(result)).toEqual(Array.from(data))
     })
 
@@ -128,7 +132,11 @@ describe('textCodec', () => {
 
     it('encodes and decodes binary with metadata', () => {
       const data = new Uint8Array([1, 2, 3, 4])
-      const metadata = { filename: 'data.bin', type: 'application/octet-stream', size: 4 }
+      const metadata = {
+        filename: 'data.bin',
+        type: 'application/octet-stream',
+        size: 4,
+      }
       const encoded = textCodec.encode(data, metadata)
       const decoded = textCodec.decode(encoded)
 
@@ -188,7 +196,11 @@ describe('textCodec', () => {
     })
 
     it('handles special characters in JSON', () => {
-      const data = { text: 'Special: 你好 🎉', emoji: '🚀', newline: 'line1\nline2' }
+      const data = {
+        text: 'Special: 你好 🎉',
+        emoji: '🚀',
+        newline: 'line1\nline2',
+      }
       const encoded = textCodec.encode(data)
       const decoded = textCodec.decode(encoded)
 
@@ -273,7 +285,9 @@ describe('textCodec', () => {
       const decoded = textCodec.decode(encoded)
 
       expect(decoded.data).toBeInstanceOf(Uint8Array)
-      const result = new Uint16Array((decoded.data as Uint8Array).slice().buffer)
+      const result = new Uint16Array(
+        (decoded.data as Uint8Array).slice().buffer
+      )
       expect(Array.from(result)).toEqual([200, 300, 400])
     })
   })
@@ -299,7 +313,9 @@ describe('textCodec', () => {
       let encoded = textCodec.encode(original, metadata)
       for (let i = 0; i < 10; i++) {
         const decoded = textCodec.decode(encoded)
-        expect(Array.from(decoded.data as Uint8Array)).toEqual(Array.from(original))
+        expect(Array.from(decoded.data as Uint8Array)).toEqual(
+          Array.from(original)
+        )
         expect(decoded.metadata).toEqual(metadata)
         encoded = textCodec.encode(decoded.data, decoded.metadata)
       }

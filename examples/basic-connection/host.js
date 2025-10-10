@@ -11,7 +11,7 @@ const connections = new Map()
 const peer = await createPeer()
 peerIdEl.textContent = peer.id
 
-peer.on('connection', async (conn) => {
+peer.on('connection', async conn => {
   connections.set(conn.peer, conn)
 
   const li = document.createElement('li')
@@ -21,7 +21,7 @@ peer.on('connection', async (conn) => {
 
   await conn.send({ type: 'welcome', message: 'Hello from host!' })
 
-  conn.on('data', (data) => {
+  conn.on('data', data => {
     const li = document.createElement('li')
     li.textContent = `${conn.peer}: ${JSON.stringify(data)}`
     messagesEl.appendChild(li)

@@ -12,17 +12,21 @@ const TEST_CONFIG = {
 }
 
 describe('Peer - Error Handling & Resilience Tests', () => {
-  runErrorHandlingTests(createTestFactory({
-    name: 'Peer',
-    config: TEST_CONFIG,
-    createFn: createPeer,
-  }))
+  runErrorHandlingTests(
+    createTestFactory({
+      name: 'Peer',
+      config: TEST_CONFIG,
+      createFn: createPeer,
+    })
+  )
 })
 
 describe('DataPeer Only - Error Handling & Resilience Tests', () => {
-  runErrorHandlingTests(createTestFactory({
-    name: 'DataPeer',
-    config: TEST_CONFIG,
-    createFn: createDataPeer,
-  }))
+  runErrorHandlingTests(
+    createTestFactory({
+      name: 'DataPeer',
+      config: TEST_CONFIG,
+      createFn: createDataPeer,
+    })
+  )
 })
