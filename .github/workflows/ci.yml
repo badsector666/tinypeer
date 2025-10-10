@@ -38,8 +38,8 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
 
-      - name: Type check
-        run: npm run typecheck
+      - name: Format and Type check
+        run: npm run check
 
       - name: Build
         run: npm run build

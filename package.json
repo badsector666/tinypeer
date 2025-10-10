@@ -39,6 +39,7 @@
     "test:chromium": "vitest --project integration --browser chromium",
     "test:firefox": "vitest --project integration --browser firefox",
     "test:coverage": "vitest --coverage --browser chromium",
+    "check": "prettier --check \"src/**/*.ts\" && tsc --noEmit",
     "format": "prettier --write \"src/**/*.ts\"",
     "typecheck": "tsc --noEmit"
   },
