@@ -4,6 +4,9 @@
 [![license](https://img.shields.io/npm/l/tinypeer.svg)](https://github.com/jamsinclair/tinypeer/blob/main/LICENSE.md)
 [![bundlephobia minzipped size](https://badgen.net/bundlephobia/minzip/tinypeer)](https://bundlephobia.com/package/tinypeer)
 
+> [!WARNING]  
+> This project is in early development. The API may change before a stable 1.0 release. Use with caution in production.
+
 A minimalistic, modern peer-to-peer library for the browser. Compatible with PeerJS servers.
 
 ## Why TinyPeer?
