@@ -1,0 +1,58 @@
+{
+  "name": "tinypeer",
+  "version": "0.1.0",
+  "description": "Tiny, modern WebRTC library compatible with PeerJS servers",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && node scripts/bundle-size.js",
+    "examples": "vite examples",
+    "test": "vitest --browser chromium",
+    "test:unit": "vitest --project unit",
+    "test:chromium": "vitest --project integration --browser chromium",
+    "test:firefox": "vitest --project integration --browser firefox",
+    "test:coverage": "vitest --coverage --browser chromium",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "webrtc",
+    "peer",
+    "p2p",
+    "peerjs",
+    "data-channels",
+    "peer.js",
+    "peer-to-peer",
+    "multiplayer",
+    "peerjs",
+    "peerjs alternative"
+  ],
+  "author": "Jamie Sinclair <jamsinclair+npm@gmail.com> (https://jamie.tokyo)",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@vitejs/plugin-basic-ssl": "^2.1.0",
+    "@vitest/browser": "^3.2.4",
+    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/ui": "^3.2.4",
+    "esbuild": "^0.25.10",
+    "peer": "^1.0.2",
+    "playwright": "^1.55.1",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^7.0.0",
+    "vitest": "^3.0.0"
+  }
+}
