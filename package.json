@@ -2,6 +2,21 @@
   "name": "tinypeer",
   "version": "0.1.0",
   "description": "Tiny, modern WebRTC library compatible with PeerJS servers",
+  "author": "Jamie Sinclair <jamsinclair+npm@gmail.com> (https://jamie.tokyo)",
+  "repository": "github:jamsinclair/tinypeer",
+  "license": "MIT",
+  "keywords": [
+    "webrtc",
+    "peer",
+    "p2p",
+    "peerjs",
+    "data-channels",
+    "peer.js",
+    "peer-to-peer",
+    "multiplayer",
+    "peerjs",
+    "peerjs alternative"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -27,20 +42,6 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": [
-    "webrtc",
-    "peer",
-    "p2p",
-    "peerjs",
-    "data-channels",
-    "peer.js",
-    "peer-to-peer",
-    "multiplayer",
-    "peerjs",
-    "peerjs alternative"
-  ],
-  "author": "Jamie Sinclair <jamsinclair+npm@gmail.com> (https://jamie.tokyo)",
-  "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@vitejs/plugin-basic-ssl": "^2.1.0",
