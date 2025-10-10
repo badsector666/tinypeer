@@ -360,7 +360,7 @@ host.on('connection', async (conn) => {
 })
 ```
 
-For more examples (like multiplayer games), see the [`examples/`](examples/) directory.
+For more examples, see the [`examples/`](examples/) directory.
 
 ## Advanced
 
