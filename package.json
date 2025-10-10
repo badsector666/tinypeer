@@ -39,9 +39,9 @@
     "test:chromium": "vitest --project integration --browser chromium",
     "test:firefox": "vitest --project integration --browser firefox",
     "test:coverage": "vitest --coverage --browser chromium",
-    "check": "prettier --check \"src/**/*.ts\" && tsc --noEmit",
+    "check": "prettier --check \"src/**/*.ts\" && npm run typecheck",
     "format": "prettier --write \"src/**/*.ts\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit && tsc --noEmit --project tests/tsconfig.json"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

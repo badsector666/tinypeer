@@ -19,11 +19,8 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
-    "skipLibCheck": true,
-    "types": [
-      "@vitest/browser/providers/playwright"
-    ]
+    "skipLibCheck": true
   },
-  "include": ["src/**/*", "**/*.test.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
