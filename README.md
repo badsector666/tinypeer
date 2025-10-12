@@ -7,7 +7,9 @@
 > [!WARNING]  
 > This project is in early development. The API may change before a stable 1.0 release. Use with caution in production.
 
-A minimalistic, modern peer-to-peer library for the browser. Compatible with PeerJS servers.
+A minimalistic, peer-to-peer WebRTC library for the browser. Compatible with PeerJS servers.
+
+A younger sibling to [PeerJS](https://github.com/peers/peerjs) focused on simplicity, modern features, and a tiny bundle size.
 
 ## Why TinyPeer?
 
@@ -414,7 +416,8 @@ If there is a notable browser quirk or bug, please [open an issue](https://githu
 
 MIT
 
-## Inspired By
+## Acknowledgements
 
+Inspired by:
 - [PeerJS](https://peerjs.com/)
 - [Trystero](https://github.com/dmotz/trystero)
