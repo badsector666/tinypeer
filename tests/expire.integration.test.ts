@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { createPeer, createDataPeer } from '../src/index.js'
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))

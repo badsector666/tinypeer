@@ -6,6 +6,6 @@
     "noEmit": true,
     "types": ["@vitest/browser/providers/playwright", "vitest/globals"]
   },
-  "include": ["**/*.ts", "**/*.test.ts"],
+  "include": ["./**/*.ts", "./**/*.test.ts"],
   "exclude": ["node_modules"]
 }
