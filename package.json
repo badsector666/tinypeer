@@ -1,6 +1,6 @@
 {
   "name": "tinypeer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Tiny, modern WebRTC library compatible with PeerJS servers",
   "author": "Jamie Sinclair <jamsinclair+npm@gmail.com> (https://jamie.tokyo)",
   "repository": "github:jamsinclair/tinypeer",
