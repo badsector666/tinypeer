@@ -4,7 +4,8 @@ TinyPeer is compatible with PeerJS signaling servers and uses a more modern clie
 
 ## API Changes
 
-- **Promises instead of callbacks** - `createPeer()`, `connect()`, and `call()` return promises
+- **Promises for async operations** - `createPeer()` and `connect()` return promises
+- **Synchronous call initiation** - `call()` returns `MediaConnection` immediately (like PeerJS)
 - **Promise-based streams** - `await call.stream` instead of event-only access
 - **No `open` event needed** - Promises resolve when ready
 - **Explicit rejection** - `call.reject()` method for clear call rejection
@@ -61,7 +62,7 @@ peer.on('open', () => {
 #### TinyPeer
 ```typescript
 const peer = await createPeer({ id: 'my-id' })
-const call = await peer.call('other-peer', localStream)
+const call = peer.call('other-peer', localStream)
 const remoteStream = await call.stream
 // Use remoteStream
 ```

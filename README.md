@@ -111,13 +111,13 @@ const conn = await peer.connect('other-peer', {
 })
 ```
 
-#### `peer.call(peerId, stream, options?): Promise<MediaConnection>`
+#### `peer.call(peerId, stream, options?): MediaConnection`
 
-Initiates a media call to another peer. Resolves when the call is established.
+Initiates a media call to another peer. Returns immediately with a MediaConnection object. The stream promise resolves when the remote peer answers and media is received.
 
 ```typescript
 const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-const call = await peer.call('other-peer', localStream, {
+const call = peer.call('other-peer', localStream, {
   metadata: { username: 'Alice' }
 })
 const remoteStream = await call.stream
@@ -314,7 +314,7 @@ const localStream = await navigator.mediaDevices.getUserMedia({
 
 localVideoEl.srcObject = localStream
 
-const call = await caller.call('bob', localStream)
+const call = caller.call('bob', localStream)
 const remoteStream = await call.stream
 remoteVideoEl.srcObject = remoteStream
 

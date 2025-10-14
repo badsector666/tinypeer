@@ -24,7 +24,7 @@ callBtn.addEventListener('click', async () => {
 
     localVideo.srcObject = localStream
 
-    const call = await peer.call(calleeId, localStream, {
+    const call = peer.call(calleeId, localStream, {
       metadata: { username: 'Caller' },
     })
 

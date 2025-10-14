@@ -8,132 +8,154 @@ export function createMediaCall(
   stream: MediaStream,
   metadata?: unknown,
   timeout = 30000
-): Promise<MediaConnection> {
+): MediaConnection {
   const connectionId = generateMediaConnectionId()
-  const pc = core._createMediaPC(peerId, connectionId, true)
 
-  return new Promise<MediaConnection>((resolve, reject) => {
-    const timer = setTimeout(() => {
-      pc.close()
-      reject(new Error('Media connection timeout'))
-    }, timeout)
+  let streamResolve: ((stream: MediaStream) => void) | undefined
+  let streamReject: ((error: Error) => void) | undefined
+  let isClosed = false
+  let timer: NodeJS.Timeout | undefined
 
-    const handlers: {
-      stream?: (stream: MediaStream) => void
-      close?: () => void
-      error?: (error: Error) => void
-    } = {}
+  const handlers: {
+    stream?: (stream: MediaStream) => void
+    close?: () => void
+    error?: (error: Error) => void
+  } = {}
 
-    let streamResolve: ((stream: MediaStream) => void) | undefined
-    let streamReject: ((error: Error) => void) | undefined
-    let isClosed = false
+  const pc = core._createMediaPC(peerId, connectionId, true, expiredPeerId => {
+    // Handle EXPIRE: reject stream promise
+    if (!isClosed) {
+      if (timer) clearTimeout(timer)
+      isClosed = true
+      const error = new Error(`Could not connect to peer ${expiredPeerId}`)
+      if (streamReject) {
+        streamReject(error)
+        streamReject = undefined
+        streamResolve = undefined
+      }
+      handlers.close?.()
+    }
+  })
 
-    const streamPromise = new Promise<MediaStream>((res, rej) => {
-      streamResolve = res
-      streamReject = rej
-    })
+  const streamPromise = new Promise<MediaStream>((res, rej) => {
+    streamResolve = res
+    streamReject = rej
+  })
 
-    streamPromise.catch(() => {})
+  streamPromise.catch(() => {})
 
+  timer = setTimeout(() => {
+    if (!isClosed && streamReject) {
+      isClosed = true
+      streamReject(new Error('Media connection timeout'))
+      streamReject = undefined
+      streamResolve = undefined
+    }
+    pc.close()
+  }, timeout)
+
+  try {
     for (const track of stream.getTracks()) {
       pc.addTrack(track, stream)
     }
+  } catch {
+    // PC might be closed if EXPIRE arrived - ignore, stream will be rejected
+  }
 
-    pc.ontrack = event => {
-      const remoteStream = event.streams?.[0]
-      if (remoteStream && streamResolve) {
-        clearTimeout(timer)
-        streamResolve(remoteStream)
-        streamResolve = undefined
-        streamReject = undefined
-        handlers.stream?.(remoteStream)
-      }
+  pc.ontrack = event => {
+    const remoteStream = event.streams?.[0]
+    if (remoteStream && streamResolve) {
+      clearTimeout(timer)
+      streamResolve(remoteStream)
+      streamResolve = undefined
+      streamReject = undefined
+      handlers.stream?.(remoteStream)
     }
+  }
 
-    pc.onnegotiationneeded = async () => {
-      try {
-        await pc.setLocalDescription()
+  pc.onnegotiationneeded = async () => {
+    try {
+      await pc.setLocalDescription()
 
-        if (pc.localDescription) {
-          core._sendSignal(peerId, 'OFFER', {
-            connectionId,
-            type: 'media',
-            metadata,
-            sdp: pc.localDescription,
-          })
-        }
-      } catch {
-        // Ignore negotiation errors
-      }
-    }
-
-    pc.onicecandidate = event => {
-      if (event.candidate) {
-        core._sendSignal(peerId, 'CANDIDATE', {
+      if (pc.localDescription) {
+        core._sendSignal(peerId, 'OFFER', {
           connectionId,
           type: 'media',
-          candidate: event.candidate.toJSON(),
+          metadata,
+          sdp: pc.localDescription,
         })
       }
+    } catch {
+      // Ignore negotiation errors
     }
+  }
 
-    pc.onconnectionstatechange = () => {
-      if (pc.connectionState === 'failed' || pc.connectionState === 'closed') {
-        clearTimeout(timer)
-        if (!isClosed) {
-          isClosed = true
-          if (streamReject) {
-            streamReject(new Error('Media connection closed'))
-          }
-          handlers.close?.()
+  pc.onicecandidate = event => {
+    if (event.candidate) {
+      core._sendSignal(peerId, 'CANDIDATE', {
+        connectionId,
+        type: 'media',
+        candidate: event.candidate.toJSON(),
+      })
+    }
+  }
+
+  pc.onconnectionstatechange = () => {
+    if (pc.connectionState === 'failed' || pc.connectionState === 'closed') {
+      clearTimeout(timer)
+      if (!isClosed) {
+        isClosed = true
+        if (streamReject) {
+          streamReject(new Error('Media connection closed'))
         }
+        handlers.close?.()
       }
     }
+  }
 
-    const mediaConnection: MediaConnection = {
-      peer: peerId,
-      metadata,
-      stream: streamPromise,
-      answer: async () => {
-        throw new Error('Cannot answer: this is not an incoming call')
-      },
-      reject: async () => {
-        if (isClosed) return
+  const mediaConnection: MediaConnection = {
+    peer: peerId,
+    metadata,
+    stream: streamPromise,
+    answer: async () => {
+      throw new Error('Cannot answer: this is not an incoming call')
+    },
+    reject: async () => {
+      if (isClosed) return
 
-        isClosed = true
-        clearTimeout(timer)
+      isClosed = true
+      clearTimeout(timer)
 
-        if (streamReject) {
-          streamReject(new Error('Media connection rejected'))
-          streamReject = undefined
-          streamResolve = undefined
-        }
+      if (streamReject) {
+        streamReject(new Error('Media connection rejected'))
+        streamReject = undefined
+        streamResolve = undefined
+      }
 
-        handlers.close?.()
-        pc.close()
-      },
-      close: () => {
-        if (isClosed) return
+      handlers.close?.()
+      pc.close()
+    },
+    close: () => {
+      if (isClosed) return
 
-        isClosed = true
-        clearTimeout(timer)
+      isClosed = true
+      clearTimeout(timer)
 
-        if (streamReject) {
-          streamReject(new Error('Media connection closed by local user'))
-          streamReject = undefined
-          streamResolve = undefined
-        }
+      if (streamReject) {
+        streamReject(new Error('Media connection closed by local user'))
+        streamReject = undefined
+        streamResolve = undefined
+      }
 
-        handlers.close?.()
-        pc.close()
-      },
-      on: ((event: string, handler: any) => {
-        handlers[event as keyof typeof handlers] = handler
-      }) as MediaConnection['on'],
-    }
+      handlers.close?.()
+      pc.close()
+    },
+    on: ((event: string, handler: any) => {
+      handlers[event as keyof typeof handlers] = handler
+    }) as MediaConnection['on'],
+  }
 
-    resolve(mediaConnection)
-  })
+  return mediaConnection
 }
 
 export function handleIncomingMediaOffer(

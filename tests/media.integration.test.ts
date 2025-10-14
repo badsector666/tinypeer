@@ -52,7 +52,7 @@ describe('Media Connection Tests', () => {
         })
       })
 
-      const call = await caller.call('callee', localStream, {
+      const call = caller.call('callee', localStream, {
         metadata: { username: 'Alice' },
       })
 
@@ -86,7 +86,7 @@ describe('Media Connection Tests', () => {
         // Don't answer - let it timeout
       })
 
-      const call = await caller.call('callee-2', callerStream)
+      const call = caller.call('callee-2', callerStream)
 
       expect(call).toBeDefined()
       expect(typeof call.answer).toBe('function')
@@ -118,7 +118,7 @@ describe('Media Connection Tests', () => {
         })
       })
 
-      await caller.call('callee-3', await getTestMediaStream(), { metadata })
+      caller.call('callee-3', await getTestMediaStream(), { metadata })
 
       const incomingCall = await callPromise
       expect(incomingCall.metadata).toEqual(metadata)
@@ -142,10 +142,7 @@ describe('Media Connection Tests', () => {
         await call.reject()
       })
 
-      const call = await caller.call(
-        'callee-reject',
-        await getTestMediaStream()
-      )
+      const call = caller.call('callee-reject', await getTestMediaStream())
 
       expect(call).toBeDefined()
     }, 10000)
@@ -168,7 +165,7 @@ describe('Media Connection Tests', () => {
         })
       })
 
-      const call = await caller.call('callee-close', await getTestMediaStream())
+      const call = caller.call('callee-close', await getTestMediaStream())
 
       expect(typeof call.close).toBe('function')
 
@@ -192,10 +189,7 @@ describe('Media Connection Tests', () => {
 
       peers.push(caller, callee)
 
-      const call = await caller.call(
-        'callee-events',
-        await getTestMediaStream()
-      )
+      const call = caller.call('callee-events', await getTestMediaStream())
 
       const streamPromise = new Promise<void>(resolve => {
         call.on('stream', stream => {
@@ -239,7 +233,7 @@ describe('Media Connection Tests', () => {
         await call.answer(await getTestMediaStream())
       })
 
-      const call = await caller.call('callee-tracks', stream)
+      const call = caller.call('callee-tracks', stream)
 
       expect(call).toBeDefined()
       expect(stream.getVideoTracks().length).toBeGreaterThan(0)
@@ -258,15 +252,11 @@ describe('Media Connection Tests', () => {
 
       const stream = await getTestMediaStream()
 
-      try {
-        const call = await caller.call('non-existent-peer', stream, {
-          connectionTimeout: 2000,
-        })
+      const call = caller.call('non-existent-peer', stream, {
+        connectionTimeout: 2000,
+      })
 
-        expect(call).toBeDefined()
-      } catch (error) {
-        expect(error).toBeDefined()
-      }
+      expect(call).toBeDefined()
     }, 5000)
 
     it('rejects when answer is not called within timeout', async () => {
@@ -285,7 +275,7 @@ describe('Media Connection Tests', () => {
         // Don't answer - let it timeout
       })
       const stream = await getTestMediaStream()
-      const call = await caller.call('callee-timeout', stream)
+      const call = caller.call('callee-timeout', stream)
 
       expect(call).toBeDefined()
     }, 10000)

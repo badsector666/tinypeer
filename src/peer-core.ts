@@ -26,6 +26,7 @@ type ConnectionState = {
   channel: RTCDataChannel | null
   connection?: Connection
   peerId: string
+  onExpire?: (peerId: string) => void
 }
 
 type PendingDataConnection = {
@@ -42,7 +43,8 @@ export type PeerCoreInternal = {
   _createMediaPC: (
     peerId: string,
     connectionId: string,
-    initiator: boolean
+    initiator: boolean,
+    onExpire?: (peerId: string) => void
   ) => RTCPeerConnection
   _sendSignal: (
     dst: string,
@@ -133,6 +135,10 @@ export async function createPeerCore(
               new Error(`Could not connect to peer ${expiredPeerId}`)
             )
             pendingConnections.delete(connectionId)
+          }
+          // Call media-specific expire handler if present
+          if (state.onExpire) {
+            state.onExpire(expiredPeerId)
           }
           connections.delete(connectionId)
           signalRouter.unregister(connectionId)
@@ -432,7 +438,8 @@ export async function createPeerCore(
     _createMediaPC: (
       remotePeerId: string,
       connectionId: string,
-      initiator: boolean
+      initiator: boolean,
+      onExpire?: (peerId: string) => void
     ) => {
       const pc = makePeerConnection(initiator, connectionId)
       signalRouter.register(connectionId, pc)
@@ -440,6 +447,7 @@ export async function createPeerCore(
         pc,
         channel: null,
         peerId: remotePeerId,
+        onExpire,
       })
       return pc
     },

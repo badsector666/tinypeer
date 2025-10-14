@@ -18,7 +18,7 @@ export type Peer = {
     peerId: string,
     stream: MediaStream,
     options?: CallOptions
-  ) => Promise<MediaConnection>
+  ) => MediaConnection
   disconnect: () => void
   destroy: () => void
   on: ((event: 'connection', handler: (conn: Connection) => void) => void) &
