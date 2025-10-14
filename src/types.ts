@@ -117,6 +117,7 @@ export type InvalidKeyMessage = {
 
 export type ExpireMessage = {
   type: 'EXPIRE'
+  src: string // The peer that failed to respond
 }
 
 export type LeaveMessage = {

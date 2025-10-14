@@ -16,7 +16,7 @@ A younger sibling to [PeerJS](https://github.com/peers/peerjs) focused on simpli
 - **Simple** - Functional design, minimal API surface
 - **Modern** - ES2020+, TypeScript, ESM-only, Promise-based
 - **Full-featured** - Data channels + media streaming (audio/video)
-- **Tiny** - ~4.01 KB minified + gzipped
+- **Tiny** - ~4.12 KB minified + gzipped
 - **Compatible** - Works with existing PeerJS servers
 - **Zero dependencies**
 
@@ -392,7 +392,7 @@ peer.on('connection', (conn) => {
 ```
 
 **Benefits:**
-- Smaller bundle size 3.24KB (no media connection code)
+- Smaller bundle size 3.35KB (no media connection code)
 - Same API as `createPeer()` for data connections
 - Perfect for multiplayer games, chat apps, collaborative tools
 

@@ -25,6 +25,7 @@ type ConnectionState = {
   pc: RTCPeerConnection
   channel: RTCDataChannel | null
   connection?: Connection
+  peerId: string
 }
 
 type PendingDataConnection = {
@@ -121,6 +122,26 @@ export async function createPeerCore(
     connections.clear()
   })
 
+  socket.on('expire', (expiredPeerId: string) => {
+    for (const [connectionId, state] of connections.entries()) {
+      if (state.peerId === expiredPeerId) {
+        const initiator = (state.pc as any)._initiator
+        if (initiator) {
+          const pending = pendingConnections.get(connectionId)
+          if (pending) {
+            pending.reject(
+              new Error(`Could not connect to peer ${expiredPeerId}`)
+            )
+            pendingConnections.delete(connectionId)
+          }
+          connections.delete(connectionId)
+          signalRouter.unregister(connectionId)
+          state.pc.close()
+        }
+      }
+    }
+  })
+
   socket.on('close', () => {
     if (!destroyed) {
       for (const state of connections.values()) {
@@ -213,6 +234,7 @@ export async function createPeerCore(
       const state: ConnectionState = {
         pc,
         channel,
+        peerId,
       }
 
       connections.set(connectionId, state)
@@ -317,6 +339,7 @@ export async function createPeerCore(
       const state: ConnectionState = {
         pc,
         channel,
+        peerId: message.src,
       }
 
       connections.set(connectionId, state)
@@ -377,7 +400,7 @@ export async function createPeerCore(
       }
     })
 
-    connections.set(connectionId, { pc, channel: null })
+    connections.set(connectionId, { pc, channel: null, peerId: message.src })
   }
 
   function disconnect(): void {
@@ -407,12 +430,17 @@ export async function createPeerCore(
       emitter.on(event, handler)
     },
     _createMediaPC: (
-      _remotePeerId: string,
+      remotePeerId: string,
       connectionId: string,
       initiator: boolean
     ) => {
       const pc = makePeerConnection(initiator, connectionId)
       signalRouter.register(connectionId, pc)
+      connections.set(connectionId, {
+        pc,
+        channel: null,
+        peerId: remotePeerId,
+      })
       return pc
     },
     _sendSignal: (

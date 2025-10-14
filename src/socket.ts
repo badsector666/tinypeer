@@ -8,6 +8,7 @@ import type {
   OfferMessage,
   AnswerMessage,
   CandidateMessage,
+  ExpireMessage,
 } from './types.js'
 
 export type SocketEvents = {
@@ -18,6 +19,7 @@ export type SocketEvents = {
   offer: (message: OfferMessage) => void
   answer: (message: AnswerMessage) => void
   candidate: (message: CandidateMessage) => void
+  expire: (peerId: string) => void
   close: () => void
   error: (error: Error) => void
 }
@@ -161,7 +163,7 @@ function routeMessage(
       break
 
     case 'EXPIRE':
-      handlers.close?.()
+      handlers.expire?.((message as ExpireMessage).src)
       break
 
     default:
