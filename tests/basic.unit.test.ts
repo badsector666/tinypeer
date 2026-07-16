@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect } from 'bun:test'
 import { generateId, generateToken, isValidId } from '../src/utils.js'
 import { createEmitter } from '../src/events.js'
 import { createPeer, createDataPeer } from '../src/index.js'
@@ -129,8 +129,9 @@ describe('Peer Creation', () => {
     await expect(createPeer({ id: 'invalid id' })).rejects.toThrow()
   })
 
-  it('accepts valid peer IDs', () => {
-    expect(() => createPeer({ id: 'valid-peer-id' })).not.toThrow()
+  it('returns a promise for valid peer IDs', () => {
+    const result = createPeer({ id: 'valid-peer-id' })
+    expect(result).toBeInstanceOf(Promise)
   })
 })
 
@@ -144,8 +145,9 @@ describe('Data Peer Creation', () => {
     await expect(createDataPeer({ id: 'invalid id' })).rejects.toThrow()
   })
 
-  it('accepts valid peer IDs', () => {
-    expect(() => createDataPeer({ id: 'valid-peer-id' })).not.toThrow()
+  it('returns a promise for valid peer IDs', () => {
+    const result = createDataPeer({ id: 'valid-peer-id' })
+    expect(result).toBeInstanceOf(Promise)
   })
 })
 

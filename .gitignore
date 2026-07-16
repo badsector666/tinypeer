@@ -41,6 +41,11 @@ Thumbs.db
 # Lock files (keep package-lock.json but ignore others)
 yarn.lock
 pnpm-lock.yaml
+bun.lock
+bun.lockb
+
+# Graphify analysis output
+graphify-out/
 
 # Ignore AI tooling other users might have
 .claude

@@ -18,18 +18,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
-          cache: 'npm'
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install
 
       - name: Get Playwright version
         id: playwright-version
-        run: echo "version=$(jq -r '.packages["node_modules/playwright"].version' package-lock.json)" >> $GITHUB_OUTPUT
+        run: echo "version=$(bun x playwright --version 2>/dev/null || cat node_modules/playwright/package.json | bun -e "const p=await Bun.stdin.json();console.log(p.version)")" >> $GITHUB_OUTPUT
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -39,20 +38,20 @@ jobs:
           key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
 
       - name: Format and Type check
-        run: npm run check
+        run: bun run check
 
       - name: Build
-        run: npm run build
+        run: bun run build
 
       - name: Run unit tests
-        run: npm run test:unit
+        run: bun run test:unit
 
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium firefox
+        run: bun x playwright install --with-deps chromium firefox
 
       - name: Run integration tests in Chromium
-        run: npm run test:chromium
+        run: bun run test:chromium
 
       - name: Run integration tests in Firefox
-        run: npm run test:firefox
+        run: bun run test:firefox
