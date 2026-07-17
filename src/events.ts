@@ -37,4 +37,3 @@ export function createEmitter() {
   }
 }
 
-export type EventEmitter = ReturnType<typeof createEmitter>

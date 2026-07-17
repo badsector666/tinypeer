@@ -11,7 +11,7 @@ import type {
   ExpireMessage,
 } from './messages.js'
 
-export type SocketEvents = {
+type SocketEvents = {
   open: (id: string) => void
   message: (message: ServerMessage) => void
   serverError: (error: ErrorMessage) => void

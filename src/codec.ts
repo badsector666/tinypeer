@@ -1,57 +1,47 @@
 import type { DataCodec } from './types.js'
 import { encodeText, decodeText } from './utils.js'
 
-const IS_BINARY = 1
-const IS_JSON = 2
-const HAS_META = 4
+const B = 1, J = 2, M = 4
+const dv = (a: Uint8Array) => new DataView(a.buffer, a.byteOffset, a.byteLength)
 
-const dv = (b: Uint8Array) => new DataView(b.buffer, b.byteOffset, b.byteLength)
-
-function encodeData(data: unknown): Uint8Array {
-  if (data instanceof ArrayBuffer) return new Uint8Array(data)
-  if (ArrayBuffer.isView(data)) return new Uint8Array(data.buffer, data.byteOffset, data.byteLength)
-  return encodeText(typeof data === 'string' ? data : JSON.stringify(data))
+function toBytes(d: unknown): Uint8Array {
+  if (d instanceof ArrayBuffer) return new Uint8Array(d)
+  if (ArrayBuffer.isView(d)) return new Uint8Array(d.buffer, d.byteOffset, d.byteLength)
+  return encodeText(typeof d === 'string' ? d : JSON.stringify(d))
 }
 
 export const textCodec: DataCodec = {
-  encode: (data, metadata) => {
-    const isBinary = data instanceof ArrayBuffer || ArrayBuffer.isView(data)
-    const hasMeta = metadata !== undefined
-    const tag = (isBinary ? IS_BINARY : typeof data === 'string' ? 0 : IS_JSON) | (hasMeta ? HAS_META : 0)
-    const metaBytes = hasMeta ? encodeText(JSON.stringify(metadata)) : null
-    const dataBytes = encodeData(data)
-
-    const size = 1 + (metaBytes ? 4 + metaBytes.byteLength : 0) + dataBytes.byteLength
+  encode: (data, meta) => {
+    const isBin = data instanceof ArrayBuffer || ArrayBuffer.isView(data)
+    const hasMeta = meta !== undefined
+    const tag = (isBin ? B : typeof data === 'string' ? 0 : J) | (hasMeta ? M : 0)
+    const mB = hasMeta ? encodeText(JSON.stringify(meta)) : null
+    const dB = toBytes(data)
+    const size = 1 + (mB ? 4 + mB.length : 0) + dB.length
     const buf = new Uint8Array(size)
-    let off = 0
-    buf[off++] = tag
-    if (metaBytes) {
-      dv(buf).setUint32(off, metaBytes.byteLength, true)
+    buf[0] = tag
+    let off = 1
+    if (mB) {
+      dv(buf).setUint32(off, mB.length, true)
       off += 4
-      buf.set(metaBytes, off)
-      off += metaBytes.byteLength
+      buf.set(mB, off)
+      off += mB.length
     }
-    buf.set(dataBytes, off)
+    buf.set(dB, off)
     return buf.buffer
   },
 
   decode: buffer => {
     const b = new Uint8Array(buffer as ArrayBuffer)
     const tag = b[0]!
-    let off = 1
-    let metadata
-    if (tag & HAS_META) {
+    let off = 1, meta
+    if (tag & M) {
       const len = dv(b).getUint32(off, true)
       off += 4
-      metadata = JSON.parse(decodeText(b.subarray(off, off + len)))
-      off += len
+      meta = JSON.parse(decodeText(b.subarray(off, off += len)))
     }
     const payload = b.subarray(off)
-    const data = tag & IS_BINARY
-      ? payload
-      : tag & IS_JSON
-        ? JSON.parse(decodeText(payload))
-        : decodeText(payload)
-    return { data, metadata }
+    const data = tag & B ? payload : tag & J ? JSON.parse(decodeText(payload)) : decodeText(payload)
+    return { data, metadata: meta }
   },
 }

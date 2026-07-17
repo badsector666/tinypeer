@@ -34,14 +34,14 @@ export type ErrorMessage = {
   }
 }
 
-export type IdTakenMessage = {
+type IdTakenMessage = {
   type: 'ID-TAKEN'
   payload: {
     msg: string
   }
 }
 
-export type InvalidKeyMessage = {
+type InvalidKeyMessage = {
   type: 'INVALID-KEY'
   payload: {
     msg: string
@@ -89,29 +89,29 @@ export type ServerMessage =
   | CandidateMessage
   | ExpireMessage
 
-export type HeartbeatMessage = {
+type HeartbeatMessage = {
   type: 'HEARTBEAT'
 }
 
-export type ClientOfferMessage = {
+type ClientOfferMessage = {
   type: 'OFFER'
   dst: string
   payload: OfferPayload
 }
 
-export type ClientAnswerMessage = {
+type ClientAnswerMessage = {
   type: 'ANSWER'
   dst: string
   payload: AnswerPayload
 }
 
-export type ClientCandidateMessage = {
+type ClientCandidateMessage = {
   type: 'CANDIDATE'
   dst: string
   payload: CandidatePayload
 }
 
-export type ClientLeaveMessage = {
+type ClientLeaveMessage = {
   type: 'LEAVE'
 }
 
