@@ -1,41 +1,50 @@
-import { spawn } from 'child_process'
+import { spawn, execSync } from 'child_process'
 import type { ChildProcess } from 'child_process'
 
 let serverProcess: ChildProcess | null = null
+
+function tryKillPort(port: number): void {
+  try {
+    const result = execSync(`netstat -ano | findstr :${port}`, { timeout: 3000, encoding: 'utf8' })
+    for (const line of result.split('\n')) {
+      const parts = line.trim().split(/\s+/)
+      if (parts[4]) {
+        try { process.kill(parseInt(parts[4]), 'SIGKILL') } catch {}
+      }
+    }
+  } catch {
+    // Port is free, nothing to kill
+  }
+}
 
 export async function startPeerServer(port: number = 9000): Promise<number> {
   if (serverProcess) {
     return port
   }
 
+  // Kill any lingering process on the port before starting
+  tryKillPort(port)
+
   return new Promise((resolve, reject) => {
     serverProcess = spawn('bun', ['x', 'peerjs', '--port', port.toString()], {
       stdio: 'pipe',
     })
 
-    let started = false
-
     const timeout = setTimeout(() => {
-      if (!started) {
-        if (serverProcess) {
-          serverProcess.kill()
-          serverProcess = null
-        }
-        reject(new Error('PeerServer failed to start'))
+      if (serverProcess) {
+        serverProcess.kill()
+        serverProcess = null
       }
+      reject(new Error('PeerServer failed to start'))
     }, 5000)
 
     serverProcess.stdout?.on('data', data => {
-      const output = data.toString()
       if (
-        output.includes('Started PeerServer') ||
-        output.includes('listening')
+        data.toString().includes('Started PeerServer') ||
+        data.toString().includes('listening')
       ) {
-        if (!started) {
-          started = true
-          clearTimeout(timeout)
-          resolve(port)
-        }
+        clearTimeout(timeout)
+        resolve(port)
       }
     })
 
@@ -50,20 +59,12 @@ export async function startPeerServer(port: number = 9000): Promise<number> {
     })
 
     serverProcess.on('exit', code => {
-      if (!started) {
+      if (serverProcess) {
         clearTimeout(timeout)
         serverProcess = null
         reject(new Error(`PeerServer exited with code ${code}`))
       }
     })
-
-    setTimeout(() => {
-      if (!started) {
-        started = true
-        clearTimeout(timeout)
-        resolve(port)
-      }
-    }, 1000)
   })
 }
 

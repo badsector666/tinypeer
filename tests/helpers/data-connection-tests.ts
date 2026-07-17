@@ -83,7 +83,7 @@ export function runDataConnectionTests(factory: PeerFactory) {
 
       client.destroy()
       host.destroy()
-    }, 10000)
+    }, 5000)
 
     it('handles connection with metadata', async () => {
       const host = await factory.create('host-metadata')
@@ -102,7 +102,7 @@ export function runDataConnectionTests(factory: PeerFactory) {
 
       client.destroy()
       host.destroy()
-    }, 10000)
+    }, 5000)
   })
 
   describe(`${factory.name} - Connection Lifecycle`, () => {
@@ -129,7 +129,7 @@ export function runDataConnectionTests(factory: PeerFactory) {
 
       client.destroy()
       host.destroy()
-    }, 10000)
+    }, 5000)
 
     it('handles peer destroy', async () => {
       const peer = await factory.create('destroy-test')
@@ -177,7 +177,7 @@ export function runDataConnectionTests(factory: PeerFactory) {
       client1.destroy()
       client2.destroy()
       host.destroy()
-    }, 15000)
+    }, 8000)
   })
 
   describe(`${factory.name} - Error Handling`, () => {
@@ -215,7 +215,7 @@ export function runDataConnectionTests(factory: PeerFactory) {
 
       client.destroy()
       host.destroy()
-    }, 10000)
+    }, 5000)
 
     it('fires close event on connection close', async () => {
       const host = await factory.create('close-event-host')
@@ -238,6 +238,6 @@ export function runDataConnectionTests(factory: PeerFactory) {
 
       client.destroy()
       host.destroy()
-    }, 10000)
+    }, 5000)
   })
 }
