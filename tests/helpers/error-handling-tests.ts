@@ -31,7 +31,7 @@ export function runErrorHandlingTests(factory: PeerFactory) {
       await new Promise(resolve => setTimeout(resolve, 100))
 
       await expect(clientConnection.send({ test: 'data' })).rejects.toThrow(
-        'Connection is closed'
+        'Connection closed'
       )
 
       client.destroy()
