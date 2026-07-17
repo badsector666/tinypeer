@@ -9,7 +9,7 @@ export async function startPeerServer(port: number = 9000): Promise<number> {
   }
 
   return new Promise((resolve, reject) => {
-    serverProcess = spawn('npx', ['peerjs', '--port', port.toString()], {
+    serverProcess = spawn('bun', ['x', 'peerjs', '--port', port.toString()], {
       stdio: 'pipe',
     })
 
