@@ -140,9 +140,7 @@ export async function createPeerCore(
           if (state.onExpire) {
             state.onExpire(expiredPeerId)
           }
-          connections.delete(connectionId)
-          signalRouter.unregister(connectionId)
-          state.pc.close()
+          cleanupConnection(connectionId)
         }
       }
     }
@@ -156,6 +154,15 @@ export async function createPeerCore(
     }
   })
 
+  function cleanupConnection(connectionId: string): void {
+    const state = connections.get(connectionId)
+    if (state) {
+      state.pc.close()
+    }
+    connections.delete(connectionId)
+    signalRouter.unregister(connectionId)
+  }
+
   function makePeerConnection(
     initiator: boolean,
     connectionId: string
@@ -167,8 +174,7 @@ export async function createPeerCore(
 
     pc.onconnectionstatechange = () => {
       if (pc.connectionState === 'failed' || pc.connectionState === 'closed') {
-        connections.delete(connectionId)
-        signalRouter.unregister(connectionId)
+        cleanupConnection(connectionId)
       }
     }
 
@@ -178,8 +184,7 @@ export async function createPeerCore(
         pc.iceConnectionState === 'closed' ||
         pc.iceConnectionState === 'disconnected'
       ) {
-        connections.delete(connectionId)
-        signalRouter.unregister(connectionId)
+        cleanupConnection(connectionId)
       }
     }
     ;(pc as any)._initiator = initiator
@@ -223,8 +228,7 @@ export async function createPeerCore(
     return new Promise<Connection>((resolve, reject) => {
       const timeout = setTimeout(() => {
         pendingConnections.delete(connectionId)
-        signalRouter.unregister(connectionId)
-        pc.close()
+        cleanupConnection(connectionId)
         reject(new Error('Connection timeout'))
       }, options?.connectionTimeout ?? 30000)
 
@@ -264,8 +268,8 @@ export async function createPeerCore(
               },
             })
           }
-        } catch {
-          // Ignore negotiation errors
+        } catch (err) {
+          console.warn('[Peer] Negotiation error:', err)
         }
       }
 
@@ -298,9 +302,7 @@ export async function createPeerCore(
             state.connection = connection
 
             connection.on('close', () => {
-              connections.delete(connectionId)
-              signalRouter.unregister(connectionId)
-              pc.close()
+              cleanupConnection(connectionId)
             })
 
             resolve(connection)
@@ -308,9 +310,7 @@ export async function createPeerCore(
           .catch(error => {
             clearTimeout(timeout)
             pendingConnections.delete(connectionId)
-            connections.delete(connectionId)
-            signalRouter.unregister(connectionId)
-            pc.close()
+            cleanupConnection(connectionId)
             reject(error)
           })
       }
@@ -322,8 +322,7 @@ export async function createPeerCore(
         ) {
           clearTimeout(timeout)
           pendingConnections.delete(connectionId)
-          connections.delete(connectionId)
-          signalRouter.unregister(connectionId)
+          cleanupConnection(connectionId)
         }
       }
     })
@@ -363,17 +362,13 @@ export async function createPeerCore(
             state.connection = connection
 
             connection.on('close', () => {
-              connections.delete(connectionId)
-              signalRouter.unregister(connectionId)
-              pc.close()
+              cleanupConnection(connectionId)
             })
 
             emitter.emit('connection', connection)
           })
           .catch(() => {
-            connections.delete(connectionId)
-            signalRouter.unregister(connectionId)
-            pc.close()
+            cleanupConnection(connectionId)
           })
       }
     }

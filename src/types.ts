@@ -127,37 +127,43 @@ export type LeaveMessage = {
   }
 }
 
+// Shared signaling payload base (both server and client messages use these)
+type BasePayload = {
+  connectionId: string
+  type: 'data' | 'media'
+}
+
+type OfferPayload = BasePayload & {
+  metadata?: unknown
+  sdp: RTCSessionDescriptionInit
+  label?: string
+  serialization?: 'json'
+  reliable?: boolean
+}
+
+type AnswerPayload = BasePayload & {
+  sdp: RTCSessionDescriptionInit
+}
+
+type CandidatePayload = BasePayload & {
+  candidate: RTCIceCandidateInit
+}
+
 export type OfferMessage = {
   type: 'OFFER'
-  payload: {
-    connectionId: string
-    type: 'data' | 'media'
-    metadata?: unknown
-    sdp: RTCSessionDescriptionInit
-    label?: string
-    serialization?: 'json'
-    reliable?: boolean
-  }
+  payload: OfferPayload
   src: string
 }
 
 export type AnswerMessage = {
   type: 'ANSWER'
-  payload: {
-    connectionId: string
-    type: 'data' | 'media'
-    sdp: RTCSessionDescriptionInit
-  }
+  payload: AnswerPayload
   src: string
 }
 
 export type CandidateMessage = {
   type: 'CANDIDATE'
-  payload: {
-    connectionId: string
-    type: 'data' | 'media'
-    candidate: RTCIceCandidateInit
-  }
+  payload: CandidatePayload
   src: string
 }
 
@@ -186,35 +192,19 @@ export type HeartbeatMessage = {
 export type ClientOfferMessage = {
   type: 'OFFER'
   dst: string
-  payload: {
-    connectionId: string
-    type: 'data' | 'media'
-    metadata?: unknown
-    sdp: RTCSessionDescriptionInit
-    label?: string
-    serialization?: 'json'
-    reliable?: boolean
-  }
+  payload: OfferPayload
 }
 
 export type ClientAnswerMessage = {
   type: 'ANSWER'
   dst: string
-  payload: {
-    connectionId: string
-    type: 'data' | 'media'
-    sdp: RTCSessionDescriptionInit
-  }
+  payload: AnswerPayload
 }
 
 export type ClientCandidateMessage = {
   type: 'CANDIDATE'
   dst: string
-  payload: {
-    connectionId: string
-    type: 'data' | 'media'
-    candidate: RTCIceCandidateInit
-  }
+  payload: CandidatePayload
 }
 
 export type ClientLeaveMessage = {
