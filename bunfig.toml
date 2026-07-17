@@ -1,4 +1,0 @@
-[install]
-# Skip optional deps to reduce EBUSY conflicts on Windows
-# https://github.com/oven-sh/bun/issues/11269
-optional = true
