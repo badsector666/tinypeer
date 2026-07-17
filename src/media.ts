@@ -124,8 +124,8 @@ export function createMediaCall(
     for (const track of stream.getTracks()) {
       pc.addTrack(track, stream)
     }
-  } catch (err) {
-    console.warn('[Peer] Failed to add track (PC may be closed):', err)
+  } catch {
+    // PC might be closed if EXPIRE arrived - ignore, stream will be rejected
   }
 
   setupMediaEventHandlers(pc, peerId, connectionId, core, state, handlers)
@@ -142,8 +142,8 @@ export function createMediaCall(
           sdp: pc.localDescription,
         })
       }
-    } catch (err) {
-      console.warn('[Peer] Negotiation error:', err)
+    } catch {
+      // Ignore negotiation errors
     }
   }
 

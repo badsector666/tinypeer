@@ -223,8 +223,8 @@ export async function createPeerCore(
               },
             })
           }
-        } catch (err) {
-          console.warn('[Peer] Negotiation error:', err)
+        } catch {
+          // Ignore negotiation errors
         }
       }
 
