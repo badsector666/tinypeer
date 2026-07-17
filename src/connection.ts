@@ -89,12 +89,8 @@ export function createConnection(
     peer: peerId,
     metadata,
     send: async (data: unknown, sendMetadata?: unknown) => {
-      if (isClosed || !channel || channel.readyState === 'closed') {
-        throw new Error('Connection is closed')
-      }
-      if (channel.readyState !== 'open') {
-        throw new Error('Connection is not open')
-      }
+      if (isClosed || !channel || channel.readyState === 'closed') throw new Error('Connection closed')
+      if (channel.readyState !== 'open') throw new Error('Connection not open')
 
       const encoded = codec.encode(data, sendMetadata)
       const threshold = channel.bufferedAmountLowThreshold || BUFFER_FALLBACK

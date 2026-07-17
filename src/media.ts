@@ -100,18 +100,9 @@ export function createMediaCall(
   const handlers: MediaHandlers = {}
   const state = createStreamState()
 
-  const pc = core._createMediaPC(peerId, connectionId, true, expiredPeerId => {
-    if (!state.isClosed) {
-      if (state.timer) clearTimeout(state.timer)
-      state.isClosed = true
-      if (state.streamReject) {
-        state.streamReject(new Error(`Could not connect to peer ${expiredPeerId}`))
-        state.streamReject = undefined
-        state.streamResolve = undefined
-      }
-      handlers.close?.()
-    }
-  })
+  const pc = core._createMediaPC(peerId, connectionId, true, expiredPeerId =>
+    closeMedia(state, handlers, pc, `Could not connect to peer ${expiredPeerId}`)
+  )
 
   const streamPromise = new Promise<MediaStream>((res, rej) => {
     state.streamResolve = res
