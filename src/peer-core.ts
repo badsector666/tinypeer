@@ -125,7 +125,7 @@ export async function createPeerCore(
           if (state.onExpire) {
             state.onExpire(expiredPeerId)
           }
-          cleanupConnection(connectionId, connections, signalRouter.unregister)
+          cleanupConnection(connectionId, connections, unreg)
         }
       }
     }
@@ -139,7 +139,13 @@ export async function createPeerCore(
     }
   })
 
-  const signalRouterUnregister = (id: string) => signalRouter.unregister(id)
+  const unreg = signalRouter.unregister
+
+  function sendCandidate(ev: RTCPeerConnectionIceEvent, dst: string, cid: string) {
+    if (ev.candidate) {
+      socket.send({ type: 'CANDIDATE', dst, payload: { connectionId: cid, type: 'data', candidate: ev.candidate.toJSON() } })
+    }
+  }
 
   async function setRemoteDescription(
     pc: RTCPeerConnection,
@@ -171,13 +177,13 @@ export async function createPeerCore(
     }
 
     const connectionId = generateConnectionId()
-    const pc = makePeerConnection(true, connectionId, connections, signalRouterUnregister, config.rtcConfig)
+    const pc = makePeerConnection(true, connectionId, connections, unreg, config.rtcConfig)
     signalRouter.register(connectionId, pc)
 
     return new Promise<Connection>((resolve, reject) => {
       const timeout = setTimeout(() => {
         pendingConnections.delete(connectionId)
-        cleanupConnection(connectionId, connections, signalRouterUnregister)
+        cleanupConnection(connectionId, connections, unreg)
         reject(new Error('Connection timeout'))
       }, options?.connectionTimeout ?? 30000)
 
@@ -222,19 +228,7 @@ export async function createPeerCore(
         }
       }
 
-      pc.onicecandidate = event => {
-        if (event.candidate) {
-          socket.send({
-            type: 'CANDIDATE',
-            dst: peerId,
-            payload: {
-              connectionId,
-              type: 'data',
-              candidate: event.candidate.toJSON(),
-            },
-          })
-        }
-      }
+      pc.onicecandidate = ev => sendCandidate(ev, peerId, connectionId)
 
       channel.onopen = () => {
         const { connection, promise } = createConnection(
@@ -251,7 +245,7 @@ export async function createPeerCore(
             state.connection = connection
 
             connection.on('close', () => {
-              cleanupConnection(connectionId, connections, signalRouterUnregister)
+              cleanupConnection(connectionId, connections, unreg)
             })
 
             resolve(connection)
@@ -259,7 +253,7 @@ export async function createPeerCore(
           .catch(error => {
             clearTimeout(timeout)
             pendingConnections.delete(connectionId)
-            cleanupConnection(connectionId, connections, signalRouterUnregister)
+            cleanupConnection(connectionId, connections, unreg)
             reject(error)
           })
       }
@@ -271,7 +265,7 @@ export async function createPeerCore(
         ) {
           clearTimeout(timeout)
           pendingConnections.delete(connectionId)
-          cleanupConnection(connectionId, connections, signalRouterUnregister)
+          cleanupConnection(connectionId, connections, unreg)
         }
       }
     })
@@ -283,7 +277,7 @@ export async function createPeerCore(
     const { src: _remotePeerId, payload } = message
     const { connectionId, sdp, metadata } = payload
 
-    const pc = makePeerConnection(false, connectionId, connections, signalRouterUnregister, config.rtcConfig)
+    const pc = makePeerConnection(false, connectionId, connections, unreg, config.rtcConfig)
     signalRouter.register(connectionId, pc)
 
     pc.ondatachannel = event => {
@@ -311,30 +305,18 @@ export async function createPeerCore(
             state.connection = connection
 
             connection.on('close', () => {
-              cleanupConnection(connectionId, connections, signalRouterUnregister)
+              cleanupConnection(connectionId, connections, unreg)
             })
 
             emitter.emit('connection', connection)
           })
           .catch(() => {
-            cleanupConnection(connectionId, connections, signalRouterUnregister)
+            cleanupConnection(connectionId, connections, unreg)
           })
       }
     }
 
-    pc.onicecandidate = event => {
-      if (event.candidate) {
-        socket.send({
-          type: 'CANDIDATE',
-          dst: message.src,
-          payload: {
-            connectionId,
-            type: 'data',
-            candidate: event.candidate.toJSON(),
-          },
-        })
-      }
-    }
+    pc.onicecandidate = ev => sendCandidate(ev, message.src, connectionId)
 
     setRemoteDescription(pc, sdp).then(() => {
       if (pc.localDescription) {
@@ -385,7 +367,7 @@ export async function createPeerCore(
       initiator: boolean,
       onExpire?: (peerId: string) => void
     ) => {
-      const pc = makePeerConnection(initiator, connectionId, connections, signalRouterUnregister, config.rtcConfig)
+      const pc = makePeerConnection(initiator, connectionId, connections, unreg, config.rtcConfig)
       signalRouter.register(connectionId, pc)
       connections.set(connectionId, {
         pc,
