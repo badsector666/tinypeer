@@ -1,10 +1,4 @@
-import type { AnswerMessage, CandidateMessage } from './types.js'
-
-export type SignalHandler = {
-  handleAnswer: (sdp: RTCSessionDescriptionInit) => void
-  handleCandidate: (candidate: RTCIceCandidateInit) => void
-  handleClose?: () => void
-}
+import type { AnswerMessage, CandidateMessage } from './messages.js'
 
 export type SignalRouter = {
   register: (connectionId: string, pc: RTCPeerConnection) => void

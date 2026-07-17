@@ -1,4 +1,5 @@
-import type { MediaConnection, OfferMessage } from './types.js'
+import type { MediaConnection } from './types.js'
+import type { OfferMessage } from './messages.js'
 import type { PeerCoreInternal } from './peer-core.js'
 import { generateMediaConnectionId } from './connection.js'
 

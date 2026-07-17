@@ -3,17 +3,9 @@ import { createSocket, type Socket } from './socket.js'
 import { createConnection, generateConnectionId } from './connection.js'
 import { generateId, generateToken, isValidId } from './utils.js'
 import { createSignalRouter, type SignalRouter } from './signal-router.js'
-import {
-  DEFAULT_CONFIG,
-  DEFAULT_ICE_SERVERS,
-  type PeerOptions,
-  type Connection,
-  type ConnectOptions,
-  type InternalConfig,
-  type OfferMessage,
-  type AnswerMessage,
-  type CandidateMessage,
-} from './types.js'
+import { DEFAULT_CONFIG, DEFAULT_ICE_SERVERS, type InternalConfig } from './config.js'
+import type { PeerOptions, Connection, ConnectOptions } from './types.js'
+import type { OfferMessage, AnswerMessage, CandidateMessage } from './messages.js'
 
 type MessageRouter = {
   routeOffer?: (message: OfferMessage) => boolean

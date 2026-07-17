@@ -1,7 +1,7 @@
+import type { InternalConfig } from './config.js'
 import type {
   ServerMessage,
   ClientMessage,
-  InternalConfig,
   OpenMessage,
   ErrorMessage,
   LeaveMessage,
@@ -9,7 +9,7 @@ import type {
   AnswerMessage,
   CandidateMessage,
   ExpireMessage,
-} from './types.js'
+} from './messages.js'
 
 export type SocketEvents = {
   open: (id: string) => void
